@@ -13,6 +13,9 @@ var createTask = function(taskText, taskDate, taskList) {
   // append span and p element to parent li
   taskLi.append(taskSpan, taskP);
 
+  //CHECK DUE DATE
+  auditTask(taskLi);
+
 
   // append to ul list on the page
   $("#list-" + taskList).append(taskLi);
@@ -161,7 +164,7 @@ $(".list-group").on("blur", "textarea", function() {
 
     //this part was added after working with JOHN
     if(tasks[status].length == 0) {
-      tasks[status].push({text: text, date: "20500420"}
+      tasks[status].push({text: text, date: "04072020"}
       
       )
     }
@@ -208,13 +211,28 @@ $(".list-group").on("click", "span", function() {
   //swap out elements
   $(this).replaceWith(dateInput);
 
+
+
+
+  //ENABLE JQUERY UI DATEPICKER
+  dateInput.datepicker({
+    minDate: 1,
+    onClose: function() {
+      //when calendar is closed, force a "change" event on 'dateInput'
+      $(this).trigger("change");
+    }
+  })
+
+
+
   //automatically focus on new element
   dateInput.trigger("focus");
 })
 
 
 //value of due date was changed
-$(".list-group").on("blur", "input[type='text']", function() {
+//CHANGED THE BLUR TO CHANGE TO ACCOMODATE DATE PICKER EDIT MODE
+$(".list-group").on("change", "input[type='text']", function() {
   //get current text
   var date = $(this)
   .val()
@@ -242,7 +260,18 @@ $(".list-group").on("blur", "input[type='text']", function() {
 
   //replace input with span element
   $(this).replaceWith(taskSpan);
+
+  //PASS TASK'S <LI> ELEMENT INYO AUDITTASK() TO CHECK NEW DUE DATE
+  auditTask($(taskSpan).closest(".list-group-item"));
 })
+
+
+//this is the DATEPICKER CODE
+
+$("#modalDueDate").datepicker({
+  minDate: 1
+});
+
 
 
 
@@ -264,6 +293,7 @@ $("#task-form-modal .btn-primary").click(function() {
   var taskText = $("#modalTaskDescription").val();
   var taskDate = $("#modalDueDate").val();
 
+
   if (taskText && taskDate) {
     createTask(taskText, taskDate, "toDo");
 
@@ -279,6 +309,8 @@ $("#task-form-modal .btn-primary").click(function() {
     saveTasks();
   }
 });
+
+
 
 // remove all tasks
 $("#remove-tasks").on("click", function() {
@@ -307,6 +339,38 @@ $("#trash").droppable({
     console.log("out");
   }
 })
+
+
+//functionality to highlight the dates area when overdue
+
+
+var auditTask = function(taskEl) {
+  //to ensure element is getting to the function
+  console.log(taskEl);
+  //get date from the task element
+  var date = $(taskEl)
+  .find("span")
+  .text()
+  .trim();
+  //ensure it worked
+  console.log(date);
+
+  //convert to moment object at 05:00pm
+  var time = moment(date, "L").set("hour", 17);
+  //this should print out an object for the value of the date variable, but at 5pm of that date
+  console.log(time);
+
+  //remove any old classes from element
+  $(taskEl).removeClass("list-group-item-warning list-group-item-danger");
+
+  //apply new class if task is near/over due date
+  if(moment().isAfter(time)) {
+    $(taskEl).addClass("list-group-item-danger");
+  }
+  else if (Math.abs(moment().diff(time, "days")) <= 2) {
+    $(taskEl).addClass("list-group-item-warning");
+  }
+}
 
 
 
