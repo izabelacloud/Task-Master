@@ -28,10 +28,10 @@ var loadTasks = function() {
   if (!tasks) {
     tasks = {
       toDo: [
-        // {
-        // text: "Sample text to do",
-        // date: "04/07/2020"
-        // }
+        {
+        text: "Sample text to do",
+        date: "04/07/2020"
+        }
       ],
       inProgress: [],
       inReview: [],
@@ -70,15 +70,22 @@ $(".card .list-group").sortable( {
   helper: "clone",
   activate: function(event) {
     console.log("activate", this);
+    var addBlack = $(this).addClass("dropover");
+    $(".bottom-trash").addClass("bottom-trash-drag");
   },
   deactivate: function(event) {
     console.log("deactivate", this);
+    var removeBlack = $(this).removeClass("dropover");
+    $(".bottom-trash").removeClass("bottom-trash-drag");
   },
   over: function(event) {
     console.log("over", event.target);
+    var dropActive = $(event.target).addClass("dropover-active");
+    $(".bottom-trash").addClass("bottom-trash-active");
   },
   out: function(event) {
     console.log("out", event.target);
+    var dropActiveRemove = $(event.target).removeClass("dropover-active");
   },
   update: function(event) {
     // console.log($(this).children());
@@ -174,8 +181,8 @@ $(".list-group").on("blur", "textarea", function() {
       console.log(text);
       console.log(tasks);
   
-      // tasks[status][index].text = text;
-      tasks[status][index-1].text = text;
+      tasks[status][index].text = text;
+      // tasks[status][index-1].text = text;
     }
 
    
@@ -334,9 +341,11 @@ $("#trash").droppable({
   },
   over: function(event, ui) {
     console.log("over");
+    $(".bottom-trash").removeClass("bottom-trash-active");
   },
   out: function(event, ui) {
     console.log("out");
+    $(".bottom-trash").removeClass("bottom-trash-active");
   }
 })
 
