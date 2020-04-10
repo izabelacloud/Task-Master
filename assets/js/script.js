@@ -370,6 +370,9 @@ var auditTask = function(taskEl) {
   else if (Math.abs(moment().diff(time, "days")) <= 2) {
     $(taskEl).addClass("list-group-item-warning");
   }
+
+
+  console.log(taskEl);
 }
 
 
@@ -378,3 +381,14 @@ var auditTask = function(taskEl) {
 loadTasks();
 
 
+//ADDING A TIMEOUT FUNCTION 5:5:4 CHAPTER
+
+//we can also use window.setInterval
+
+setInterval(function() {
+  // alert("This message happens after 5 seconds!");
+  $(".card .list-group-item").each(function (el) {
+    auditTask(el);
+  })
+
+}, (1000 * 60) * 30);
